@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BenchLab-Ai · Multímetro DC</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b1420;color:#e9f1fa;font:17px system-ui;line-height:1.5}main{max-width:760px;margin:auto;padding:24px}h1{font-size:28px}section{background:#142438;border:1px solid #34506d;border-radius:14px;padding:20px;margin:18px 0}label{display:block;margin:14px 0}select,button{font:inherit;padding:10px;border-radius:7px;border:1px solid #7394b4;background:#091624;color:#fff}select{width:100%}button{cursor:pointer}output{display:block;font:clamp(28px,7vw,48px) monospace;color:#85ffb7;margin:20px 0}.circuit{display:grid;grid-template-columns:1fr;gap:8px;text-align:center}.node{border:1px solid #78c4e9;border-radius:8px;padding:10px}.resistor{color:#f4d091}small{color:#bdcedf}#status{min-height:26px}
+</style>
+<main>
+<h1>BenchLab-Ai · Multímetro DC</h1>
+<p>Simulação educativa · uma placa, uma função: medir tensão entre duas pontas.</p>
+<section aria-label="Placa de divisor resistivo">
+<h2>Placa simples · 12 V DC</h2>
+<div class="circuit">
+<div class="node">VIN · positivo da fonte ideal de 12 V</div>
+<div class="resistor">│ R1 · 1 kΩ │</div>
+<div class="node">MID · junção de R1 e R2</div>
+<div class="resistor">│ R2 · 1 kΩ │</div>
+<div class="node">GND · negativo da fonte · 0 V</div>
+</div>
+<p><small>Modelo ideal, sem tolerância ou carga do instrumento. Com a fonte desligada, os nós ficam em 0 V pelas resistências. Não representa uma fonte ligada à rede elétrica.</small></p>
+</section>
+<section aria-label="Multímetro">
+<h2>Multímetro · V DC</h2>
+<label>Ponta vermelha · V<select id="red"><option value="">Desconectada</option><option>VIN</option><option>MID</option><option>GND</option></select></label>
+<label>Ponta preta · COM<select id="black"><option value="">Desconectada</option><option>VIN</option><option>MID</option><option>GND</option></select></label>
+<label><input id="power" type="checkbox" checked> Fonte de 12 V ligada</label>
+<output id="reading" aria-live="polite">---</output>
+<p id="status">Conecte as duas pontas.</p>
+<button id="reset" type="button">Reiniciar medição</button>
+</section>
+<p>Primeiro teste: preta em GND e vermelha em VIN. Depois mova a vermelha para MID e observe a leitura.</p>
+</main>
+<script src="meter.js"></script>
+<script>
+'use strict';
+const red = document.getElementById('red');
+const black = document.getElementById('black');
+const power = document.getElementById('power');
+function render() {
+  const result = BenchMeter.measure(red.value, black.value, power.checked);
+  document.getElementById('reading').textContent = result.text;
+  document.getElementById('status').textContent = result.status;
+}
+[red, black, power].forEach(control => control.addEventListener('change', render));
+document.getElementById('reset').addEventListener('click', () => {
+  red.value = ''; black.value = ''; power.checked = true; render();
+});
+render();
+</script>
+</html>
